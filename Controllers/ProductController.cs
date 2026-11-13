@@ -4,7 +4,7 @@ namespace Inventory.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ItemController : ControllerBase
+    public class ProductController : ControllerBase
     {
         [HttpGet]
         public IActionResult Get()
