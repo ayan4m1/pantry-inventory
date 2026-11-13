@@ -10,8 +10,12 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<InventoryDbContext>(options => options
-    .UseNpgsql(builder.Configuration.GetConnectionString("IdentityDb"))
+    .UseNpgsql(builder.Configuration.GetConnectionString("InventoryDb"))
     .UseSnakeCaseNamingConvention()
+);
+
+builder.Services.AddHealthChecks()
+    .AddNpgSql(sp => sp.GetRequiredService<IConfiguration>().GetConnectionString("InventoryDb")!
 );
 
 var app = builder.Build();
