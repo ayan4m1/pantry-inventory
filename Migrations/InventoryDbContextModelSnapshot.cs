@@ -44,13 +44,61 @@ namespace Inventory.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
                     b.HasKey("Id")
                         .HasName("pk_products");
 
                     b.ToTable("products", (string)null);
+                });
+
+            modelBuilder.Entity("Inventory.Entities.ProductStock", b =>
+                {
+                    b.Property<Guid>("HouseholdId")
+                        .HasMaxLength(64)
+                        .HasColumnType("uuid")
+                        .HasColumnName("household_id");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.HasKey("HouseholdId", "ProductId")
+                        .HasName("pk_product_stocks");
+
+                    b.HasIndex("HouseholdId")
+                        .HasDatabaseName("ix_product_stocks_household_id");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("ix_product_stocks_product_id");
+
+                    b.ToTable("product_stocks", (string)null);
+                });
+
+            modelBuilder.Entity("Inventory.Entities.ProductStock", b =>
+                {
+                    b.HasOne("Inventory.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_product_stocks_products_product_id");
+
+                    b.Navigation("Product");
                 });
 #pragma warning restore 612, 618
         }
