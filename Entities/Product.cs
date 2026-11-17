@@ -7,7 +7,5 @@
         public required string Name { get; set; }
         public float? Cost { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
-
-
     }
 }
