@@ -1,6 +1,8 @@
 using Inventory;
+using Inventory.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -61,6 +63,12 @@ builder.Services.AddDbContext<InventoryDbContext>(options => options
     .UseNpgsql(builder.Configuration.GetConnectionString("InventoryDb"))
     .UseSnakeCaseNamingConvention()
 );
+
+builder.Services.Configure<IdentitySettings>(builder.Configuration.GetSection("IdentitySettings"));
+builder.Services.AddHttpClient<IIdentityClient, IdentityClient>((sp, client) =>
+{
+    client.BaseAddress = new Uri(sp.GetRequiredService<IOptions<IdentitySettings>>().Value.BaseUrl);
+});
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(sp => sp.GetRequiredService<IConfiguration>().GetConnectionString("InventoryDb")!

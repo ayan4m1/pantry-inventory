@@ -1,4 +1,4 @@
-﻿using Inventory.Entities;
+using Inventory.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory
@@ -20,7 +20,6 @@ namespace Inventory
             {
                 e.HasKey(m => new { m.HouseholdId, m.ProductId });
                 e.HasIndex(m => m.HouseholdId);
-                e.Property(h => h.HouseholdId).HasMaxLength(64);
             });
         }
     }

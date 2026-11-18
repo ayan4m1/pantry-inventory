@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -25,7 +25,7 @@ namespace Inventory.Migrations
                 columns: table => new
                 {
                     product_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    household_id = table.Column<Guid>(type: "uuid", maxLength: 64, nullable: false),
+                    household_id = table.Column<Guid>(type: "uuid", nullable: false),
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     quantity = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
