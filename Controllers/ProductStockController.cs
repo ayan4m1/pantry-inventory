@@ -1,6 +1,5 @@
 using Inventory.Entities;
 using Inventory.Requests;
-using Inventory.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;

@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Inventory.Services
+namespace Inventory
 {
     public interface IIdentityClient
     {
