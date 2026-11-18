@@ -98,5 +98,6 @@ app.UseAuthorization();
 app.UseCors();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
