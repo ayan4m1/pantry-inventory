@@ -68,7 +68,7 @@ builder.Services.Configure<IdentitySettings>(builder.Configuration.GetSection("I
 builder.Services.AddHttpClient<IIdentityClient, IdentityClient>((sp, client) =>
 {
     client.BaseAddress = new Uri(sp.GetRequiredService<IOptions<IdentitySettings>>().Value.BaseUrl);
-});
+}).AddStandardResilienceHandler();
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(sp => sp.GetRequiredService<IConfiguration>().GetConnectionString("InventoryDb")!
