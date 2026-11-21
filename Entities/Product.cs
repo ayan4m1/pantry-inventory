@@ -17,7 +17,5 @@ namespace Inventory.Entities
 
         [Timestamp]
         public uint Version { get; set; }                 // maps to Postgres xmin: optimistic concurrency
-
-        public List<ProcessedRestock> ProcessedRestocks { get; set; } = null!;
     }
 }

@@ -6,7 +6,5 @@
         public Guid ProductId { get; set; }
         public decimal Quantity { get; set; }
         public DateTimeOffset AppliedAt { get; set; }
-
-        public Product Product { get; set; } = null!;
     }
 }
