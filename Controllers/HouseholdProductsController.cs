@@ -40,9 +40,9 @@ namespace Inventory.Controllers
         [EndpointName("getProduct")]
         [ProducesResponseType<Product>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductResponse>> Get(Guid householdId, Guid id)
+        public async Task<ActionResult<ProductResponse>> Get(Guid householdId, Guid id, CancellationToken ct)
         {
-            var product = await db.Products.FindAsync(id);
+            var product = await db.Products.FindAsync([id], ct);
 
             if (product == null)
             {
@@ -74,7 +74,7 @@ namespace Inventory.Controllers
         [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<ProductResponse>> Create(Guid householdId, [FromBody] CreateProductRequest request)
+        public async Task<ActionResult<ProductResponse>> Create(Guid householdId, [FromBody] CreateProductRequest request, CancellationToken ct)
         {
             var product = new Product()
             {
@@ -90,9 +90,9 @@ namespace Inventory.Controllers
                 Version = 1
             };
 
-            var result = await db.Products.AddAsync(product);
+            var result = await db.Products.AddAsync(product, ct);
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(ct);
 
             return Ok(new ProductResponse(
                 result.Entity.Id,
@@ -113,14 +113,22 @@ namespace Inventory.Controllers
         [EndpointName("updateProduct")]
         [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductResponse>> Update(Guid householdId, Guid id, [FromBody] UpdateProductRequest request)
+        public async Task<ActionResult<ProductResponse>> Update(Guid householdId, Guid id, [FromBody] UpdateProductRequest request, CancellationToken ct)
         {
-            var product = await db.Products.FindAsync(id);
+            var product = await db.Products.FindAsync([id], ct);
 
             if (product == null || product.HouseholdId != householdId)
             {
                 return NotFound();
             }
+
+            product.Cost = request.Cost;
+            product.LowStockThreshold = request.LowStockThreshold;
+            product.Name = request.Name;
+            product.ReorderQuantity = request.ReorderQuantity;
+            product.Unit = request.Unit;
+            product.UpdatedAt = DateTime.UtcNow;
+            product.Version++;
 
             return Ok(new ProductResponse(
                 product.Id,
@@ -142,9 +150,9 @@ namespace Inventory.Controllers
         [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductResponse>> AdjustQuantity(Guid householdId, Guid id, [FromBody] AdjustQuantityRequest request)
+        public async Task<ActionResult<ProductResponse>> AdjustQuantity(Guid householdId, Guid id, [FromBody] AdjustQuantityRequest request, CancellationToken ct)
         {
-            var product = await db.Products.FindAsync(id);
+            var product = await db.Products.FindAsync([id], ct);
 
             if (product == null || product.HouseholdId != householdId)
             {

@@ -15,16 +15,16 @@ namespace Inventory.Controllers
         [HttpPost("products/{id:guid}/restock")]
         [ProducesResponseType<Product>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductResponse>> RestockProduct(Guid id, [FromBody] RestockRequest request)
+        public async Task<ActionResult<ProductResponse>> RestockProduct(Guid id, [FromBody] RestockRequest request, CancellationToken ct)
         {
-            var product = await db.Products.FindAsync(id);
+            var product = await db.Products.FindAsync([id], ct);
 
             if (product == null)
             {
                 return NotFound();
             }
 
-            var restock = await db.ProcessedRestocks.Where(pr => pr.ProductId == id && pr.ShoppingItemId == request.ShoppingItemId).FirstAsync();
+            var restock = await db.ProcessedRestocks.Where(pr => pr.ProductId == id && pr.ShoppingItemId == request.ShoppingItemId).FirstAsync(ct);
 
             if (restock == null)
             {
@@ -37,13 +37,13 @@ namespace Inventory.Controllers
                     AppliedAt = DateTime.Now
                 };
 
-                await db.ProcessedRestocks.AddAsync(restock);
+                await db.ProcessedRestocks.AddAsync(restock, ct);
             } else
             {
                 restock.Quantity += request.Quantity;
             }
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(ct);
 
             return Ok(new ProductResponse(
                 product.Id,
