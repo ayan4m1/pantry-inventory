@@ -72,8 +72,6 @@ namespace Inventory.Controllers
         [HttpPost("products")]
         [EndpointName("createProduct")]
         [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<ProductResponse>> Create(Guid householdId, [FromBody] CreateProductRequest request, CancellationToken ct)
         {
             var product = new Product()
@@ -166,7 +164,7 @@ namespace Inventory.Controllers
                 return BadRequest();
             }
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(ct);
 
             return Ok(new ProductResponse(
                 product.Id,
@@ -187,18 +185,18 @@ namespace Inventory.Controllers
         [EndpointName("deleteProduct")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete(Guid householdId, Guid id)
+        public async Task<ActionResult> Delete(Guid householdId, Guid id, CancellationToken ct)
         {
             var query = db.Products.Where(p => p.HouseholdId == householdId && p.Id == id);
 
-            if (await query.FirstAsync() == null)
+            if (await query.FirstAsync(ct) == null)
             {
                 return NotFound();
             }
             
-            await query.ExecuteDeleteAsync();
+            await query.ExecuteDeleteAsync(ct);
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(ct);
 
             return NoContent();
         }
