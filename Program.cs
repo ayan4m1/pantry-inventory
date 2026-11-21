@@ -96,10 +96,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseCors();
 
 app.MapControllers();
 app.MapHealthChecks("/health");
