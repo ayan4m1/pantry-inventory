@@ -8,11 +8,11 @@ namespace Inventory.Controllers
 {
     // Service-to-service endpoints; the gateway blocks /api/{service}/internal/** from the outside.
     [ApiController]
-    [Route("internal")]
+    [Route("[controller]")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class InternalController(InventoryDbContext db) : ControllerBase
     {
-        [HttpDelete("products/{id:guid}/restock")]
+        [HttpPost("products/{id:guid}/restock")]
         [ProducesResponseType<Product>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductResponse>> RestockProduct(Guid id, [FromBody] RestockRequest request)
