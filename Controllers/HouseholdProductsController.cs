@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Inventory.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("households/{householdId:guid}")]
     public class HouseholdProductsController(InventoryDbContext db) : ControllerBase
     {
-        [HttpGet("households/{householdId:guid}/products")]
+        [HttpGet("products")]
         [EndpointName("listProducts")]
         [ProducesResponseType<List<Product>>(StatusCodes.Status200OK)]
         public async Task<ActionResult<IReadOnlyList<ProductResponse>>> List(Guid householdId, [FromQuery] bool lowStock, [FromQuery] string search)
@@ -36,7 +36,7 @@ namespace Inventory.Controllers
             ).ToListAsync());
         }
 
-        [HttpGet("households/{householdId:guid}/products/{id:guid}")]
+        [HttpGet("products/{id:guid}")]
         [EndpointName("getProduct")]
         [ProducesResponseType<Product>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -69,7 +69,7 @@ namespace Inventory.Controllers
             ));
         }
 
-        [HttpPost("households/{householdId:guid}/products")]
+        [HttpPost("products")]
         [EndpointName("createProduct")]
         [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -109,7 +109,7 @@ namespace Inventory.Controllers
             ));
         }
 
-        [HttpPut("households/{householdId:guid}/products/{id:guid}")]
+        [HttpPut("products/{id:guid}")]
         [EndpointName("updateProduct")]
         [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -137,7 +137,7 @@ namespace Inventory.Controllers
             ));
         }
 
-        [HttpPost("households/{householdId:guid}/products/{id:guid}/adjustments")]
+        [HttpPost("products/{id:guid}/adjustments")]
         [EndpointName("adjustProductQuantity")]
         [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -175,7 +175,7 @@ namespace Inventory.Controllers
             ));
         }
 
-        [HttpDelete("households/{householdId:guid}/products/{id:guid}")]
+        [HttpDelete("products/{id:guid}")]
         [EndpointName("deleteProduct")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
