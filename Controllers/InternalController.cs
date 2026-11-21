@@ -1,4 +1,5 @@
 using Inventory.Entities;
+using Inventory.Extensions;
 using Inventory.Requests;
 using Inventory.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ namespace Inventory.Controllers
     public class InternalController(InventoryDbContext db) : ControllerBase
     {
         [HttpPost("products/{id:guid}/restock")]
-        [ProducesResponseType<Product>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductResponse>> RestockProduct(Guid id, [FromBody] RestockRequest request, CancellationToken ct)
         {
@@ -45,19 +46,7 @@ namespace Inventory.Controllers
 
             await db.SaveChangesAsync(ct);
 
-            return Ok(new ProductResponse(
-                product.Id,
-                product.HouseholdId,
-                product.Name,
-                product.Unit,
-                product.Quantity,
-                product.LowStockThreshold,
-                product.ReorderQuantity,
-                product.Cost,
-                product.Quantity < product.LowStockThreshold,
-                product.Version,
-                product.UpdatedAt
-            ));
+            return Ok(product.ToProductResponse());
         }
     }
 }

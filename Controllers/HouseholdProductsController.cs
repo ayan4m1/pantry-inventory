@@ -1,4 +1,5 @@
 using Inventory.Entities;
+using Inventory.Extensions;
 using Inventory.Requests;
 using Inventory.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -12,33 +13,23 @@ namespace Inventory.Controllers
     {
         [HttpGet("products")]
         [EndpointName("listProducts")]
-        [ProducesResponseType<List<Product>>(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IReadOnlyList<ProductResponse>>> List(Guid householdId, [FromQuery] bool lowStock, [FromQuery] string search)
+        [ProducesResponseType<List<ProductResponse>>(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IReadOnlyList<ProductResponse>>> List(Guid householdId, [FromQuery] bool lowStock, [FromQuery] string search, CancellationToken ct)
         {
             return Ok(await db.Products
                 .Where(p =>
                     p.Name.Contains(search) &&
                     p.HouseholdId == householdId &&
                     (p.Quantity < p.LowStockThreshold) == lowStock
-                ).Select((p) => new ProductResponse(
-                    p.Id,
-                    p.HouseholdId,
-                    p.Name,
-                    p.Unit,
-                    p.Quantity,
-                    p.LowStockThreshold,
-                    p.ReorderQuantity,
-                    p.Cost,
-                    p.Quantity < p.LowStockThreshold,
-                    p.Version,
-                    p.UpdatedAt
                 )
-            ).ToListAsync());
+                .Select((p) => p.ToProductResponse())
+                .ToListAsync(ct)
+            );
         }
 
         [HttpGet("products/{id:guid}")]
         [EndpointName("getProduct")]
-        [ProducesResponseType<Product>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductResponse>> Get(Guid householdId, Guid id, CancellationToken ct)
         {
@@ -54,19 +45,7 @@ namespace Inventory.Controllers
                 return NotFound();
             }
 
-            return Ok(new ProductResponse(
-                product.Id,
-                product.HouseholdId,
-                product.Name,
-                product.Unit,
-                product.Quantity,
-                product.LowStockThreshold,
-                product.ReorderQuantity,
-                product.Cost,
-                product.Quantity < product.LowStockThreshold,
-                product.Version,
-                product.UpdatedAt
-            ));
+            return Ok(product.ToProductResponse());
         }
 
         [HttpPost("products")]
@@ -88,23 +67,10 @@ namespace Inventory.Controllers
                 Version = 1
             };
 
-            var result = await db.Products.AddAsync(product, ct);
-
+            await db.Products.AddAsync(product, ct);
             await db.SaveChangesAsync(ct);
 
-            return Ok(new ProductResponse(
-                result.Entity.Id,
-                product.HouseholdId,
-                product.Name,
-                product.Unit,
-                product.Quantity,
-                product.LowStockThreshold,
-                product.ReorderQuantity,
-                product.Cost,
-                product.Quantity < product.LowStockThreshold,
-                product.Version,
-                product.UpdatedAt
-            ));
+            return Ok(product.ToProductResponse());
         }
 
         [HttpPut("products/{id:guid}")]
@@ -128,19 +94,7 @@ namespace Inventory.Controllers
             product.UpdatedAt = DateTime.UtcNow;
             product.Version++;
 
-            return Ok(new ProductResponse(
-                product.Id,
-                product.HouseholdId,
-                product.Name,
-                product.Unit,
-                product.Quantity,
-                product.LowStockThreshold,
-                product.ReorderQuantity,
-                product.Cost,
-                product.Quantity < product.LowStockThreshold,
-                product.Version,
-                product.UpdatedAt
-            ));
+            return Ok(product.ToProductResponse());
         }
 
         [HttpPost("products/{id:guid}/adjustments")]
@@ -166,19 +120,7 @@ namespace Inventory.Controllers
 
             await db.SaveChangesAsync(ct);
 
-            return Ok(new ProductResponse(
-                product.Id,
-                product.HouseholdId,
-                product.Name,
-                product.Unit,
-                product.Quantity,
-                product.LowStockThreshold,
-                product.ReorderQuantity,
-                product.Cost,
-                product.Quantity < product.LowStockThreshold,
-                product.Version,
-                product.UpdatedAt
-            ));
+            return Ok(product.ToProductResponse());
         }
 
         [HttpDelete("products/{id:guid}")]
