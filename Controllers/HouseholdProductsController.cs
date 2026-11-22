@@ -19,11 +19,11 @@ namespace Inventory.Controllers
         [HttpGet("products")]
         [EndpointName("listProducts")]
         [ProducesResponseType<List<ProductResponse>>(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IReadOnlyList<ProductResponse>>> List(Guid householdId, [FromQuery] bool lowStock, [FromQuery] string search, CancellationToken ct)
+        public async Task<ActionResult<IReadOnlyList<ProductResponse>>> List(Guid householdId, [FromQuery] bool? lowStock, [FromQuery] string? search, CancellationToken ct)
         {
             return Ok(await db.Products
                 .Where(p =>
-                    p.Name.Contains(search) &&
+                    p.Name.Contains(search ?? "") &&
                     p.HouseholdId == householdId &&
                     (p.Quantity < p.LowStockThreshold) == lowStock
                 )
