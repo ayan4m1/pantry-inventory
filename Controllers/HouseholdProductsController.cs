@@ -23,7 +23,7 @@ namespace Inventory.Controllers
         {
             return Ok(await db.Products
                 .Where(p =>
-                    p.Name.Contains(search ?? "") &&
+                    p.Name.ToLower().Contains((search ?? "").ToLower()) &&
                     p.HouseholdId == householdId &&
                     (p.Quantity < p.LowStockThreshold) == lowStock
                 )
