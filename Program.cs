@@ -1,6 +1,8 @@
 using Inventory;
+using Inventory.Services;
 using Inventory.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -62,6 +64,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 builder.Services.AddAuthorization();
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Policies.HouseholdMember, p => p.AddRequirements(new HouseholdMemberRequirement()));
+builder.Services.AddScoped<IAuthorizationHandler, HouseholdMemberHandler>();
 
 builder.Services.AddDbContext<InventoryDbContext>(options => options
     .UseNpgsql(builder.Configuration.GetConnectionString("InventoryDb"))

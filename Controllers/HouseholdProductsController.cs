@@ -2,6 +2,8 @@ using Inventory.Entities;
 using Inventory.Extensions;
 using Inventory.Requests;
 using Inventory.Responses;
+using Inventory.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +11,9 @@ namespace Inventory.Controllers
 {
     [ApiController]
     [Route("households/{householdId:guid}")]
+    [Authorize(Policy = Policies.HouseholdMember)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public class HouseholdProductsController(InventoryDbContext db) : ControllerBase
     {
         [HttpGet("products")]
