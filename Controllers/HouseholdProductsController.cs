@@ -30,6 +30,7 @@ namespace Inventory.Controllers
                 p.HouseholdId == householdId &&
                 (!(lowStock ?? false) || (p.Quantity < p.LowStockThreshold))
             )
+            .OrderBy(p => p.Name)
             .Select((p) => p.ToProductResponse())
             .ToListAsync(ct)
         );
