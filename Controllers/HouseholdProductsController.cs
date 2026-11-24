@@ -26,7 +26,7 @@ namespace Inventory.Controllers
             CancellationToken ct
         ) => Ok(await db.Products
             .Where(p =>
-                (!string.IsNullOrWhiteSpace(search) && p.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(search) || EF.Functions.ILike(p.Name, $"%{search}%")) &&
                 p.HouseholdId == householdId &&
                 (!(lowStock ?? false) || (p.Quantity < p.LowStockThreshold))
             )
