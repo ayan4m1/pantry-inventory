@@ -29,7 +29,6 @@ namespace Inventory.Controllers
 
             if (restock == null)
             {
-
                 restock = new ProcessedRestock()
                 {
                     ProductId = id,

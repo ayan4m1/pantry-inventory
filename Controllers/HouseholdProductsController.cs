@@ -19,18 +19,20 @@ namespace Inventory.Controllers
         [HttpGet("products")]
         [EndpointName("listProducts")]
         [ProducesResponseType<List<ProductResponse>>(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IReadOnlyList<ProductResponse>>> List(Guid householdId, [FromQuery] bool? lowStock, [FromQuery] string? search, CancellationToken ct)
-        {
-            return Ok(await db.Products
-                .Where(p =>
-                    p.Name.ToLower().Contains((search ?? "").ToLower()) &&
-                    p.HouseholdId == householdId &&
-                    (p.Quantity < p.LowStockThreshold) == lowStock
-                )
-                .Select((p) => p.ToProductResponse())
-                .ToListAsync(ct)
-            );
-        }
+        public async Task<ActionResult<IReadOnlyList<ProductResponse>>> List(
+            Guid householdId,
+            [FromQuery] bool? lowStock,
+            [FromQuery] string? search,
+            CancellationToken ct
+        ) => Ok(await db.Products
+            .Where(p =>
+                (!string.IsNullOrWhiteSpace(search) && p.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase)) &&
+                p.HouseholdId == householdId &&
+                (!(lowStock ?? false) || (p.Quantity < p.LowStockThreshold))
+            )
+            .Select((p) => p.ToProductResponse())
+            .ToListAsync(ct)
+        );
 
         [HttpGet("products/{id:guid}")]
         [EndpointName("getProduct")]
